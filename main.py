@@ -13,6 +13,8 @@ ex = register_part.MyWidget(app)
 ex.show()
 app.exec_()
 ex.hide()
+if not ex.return_done():
+    sys.exit()
 CONST_K = 1
 CONST_TIME = 10
 level = ex.return_level()

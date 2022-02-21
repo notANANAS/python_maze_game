@@ -4,13 +4,12 @@ from PyQt5.QtWidgets import QMainWindow
 
 CONST_INDEX_PASS = 0
 
-flag_done = False
-
 
 class MyWidget(QMainWindow):
     def __init__(self, app):
         super().__init__()
         self.app = app
+        self.flag_done = False
         uic.loadUi('form.ui', self)
         self.con = sqlite3.connect("score.db")
         self.cur = self.con.cursor()
@@ -23,12 +22,11 @@ class MyWidget(QMainWindow):
         self.pushButton_register.clicked.connect(self.register)
 
     def login(self):
-        global flag_done
         self.name = self.lineEdit_name.text()
         self.password = self.lineEdit_pass.text()
         if self.name in self.names.keys() and int(self.lineEdit_level.text()) in (1, 2, 3):
             if self.password == self.names[self.name][CONST_INDEX_PASS]:
-                flag_done = True
+                self.flag_done = True
                 self.name_that_return = self.name
                 self.level = int(self.lineEdit_level.text())
                 print('Done')
@@ -39,9 +37,9 @@ class MyWidget(QMainWindow):
         else:
             self.lineEdit_name.setText('')
             self.lineEdit_pass.setText('')
+            self.lineEdit_level.setText('')
 
     def register(self):
-        global flag_done
         self.name = self.lineEdit_name.text()
         self.password = self.lineEdit_pass.text()
         if self.name not in self.names.keys() and int(self.lineEdit_level.text()) in (1, 2, 3):
@@ -49,7 +47,7 @@ class MyWidget(QMainWindow):
             self.name_that_return = self.name
             self.cur.execute(self.res).fetchall()
             self.con.commit()
-            flag_done = True
+            self.flag_done = True
             self.level = int(self.lineEdit_level.text())
             print('Registered')
             self.app.exit()
@@ -63,3 +61,6 @@ class MyWidget(QMainWindow):
 
     def return_name(self):
         return self.name_that_return
+    
+    def return_done(self):
+        return self.flag_done
