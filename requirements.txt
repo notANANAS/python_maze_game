@@ -1,0 +1,3 @@
+pip install pyqt5
+pip install pygame
+pip install pip install sqlite/pip install pysqlite3
