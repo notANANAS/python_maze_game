@@ -54,7 +54,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>40</y>
+      <y>30</y>
       <width>191</width>
       <height>31</height>
      </rect>
@@ -72,7 +72,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>100</y>
+      <y>90</y>
       <width>191</width>
       <height>31</height>
      </rect>
@@ -137,14 +137,14 @@
      </font>
     </property>
     <property name="text">
-     <string>Level(1, 2, 3):</string>
+     <string>Level:</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_level">
+   <widget class="QComboBox" name="comboBox_level">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>160</y>
+      <y>150</y>
       <width>191</width>
       <height>31</height>
      </rect>
@@ -154,9 +154,21 @@
       <pointsize>14</pointsize>
      </font>
     </property>
-    <property name="text">
-     <string/>
-    </property>
+    <item>
+     <property name="text">
+      <string>Level 1</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Level 2</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Level 3</string>
+     </property>
+    </item>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>

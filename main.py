@@ -20,14 +20,13 @@ CONST_TIME = 10
 level = ex.return_level()
 if level == 1:
     CONST_K = 1
-    CONST_TIME *= 1
+    CONST_TIME = 10
 elif level == 2:
     CONST_K = 2
-    CONST_TIME *= 1.5
+    CONST_TIME = 15
 elif level == 3:
     CONST_K = 3
-    CONST_TIME *= 2
-CONST_TIME = 10
+    CONST_TIME = 20
 # CONST_CELL_SIZE = 30
 CONST_B = 0
 if CONST_K % 2 == 0:
@@ -195,10 +194,11 @@ player, level_x, level_y = generate_level(generate_map())
 run = True'''
 win_flag = False
 player_coords = 0, 0
+exit_flag = False
 
 
-def main():
-    global player_coords
+def game():
+    global player_coords, exit_flag
     global win_flag, tiles_group, all_sprites, player_group
     all_sprites = pygame.sprite.Group()
     tiles_group = pygame.sprite.Group()
@@ -215,12 +215,12 @@ def main():
         screen = pygame.display.set_mode(size)'''
     player, level_x, level_y = generate_level(generate_map(0, 0))
     run = True
-    date1 = datetime.datetime.today()
+    date1 = datetime.datetime.today().second
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-                win_flag = True
+                exit_flag = True
             key = pygame.key.get_pressed()
             if key[pygame.K_DOWN]:
                 player.update(0, tile_height)
@@ -241,8 +241,9 @@ def main():
                 win_flag = True'''
             run = False
             win_flag = True
+            exit_flag = True
         player_coords = player.rect.x // CONST_CELL_SIZE, player.rect.y // CONST_CELL_SIZE
-        if datetime.datetime.today().second >= (date1 + datetime.timedelta(seconds=CONST_TIME)).second:
+        if datetime.datetime.today().second == (date1 + CONST_TIME) % 60:
             run = False
         screen.fill((0, 0, 0))
         tiles_group.draw(screen)
@@ -251,38 +252,39 @@ def main():
 
 
 date_before_start = datetime.datetime.today()
-while win_flag is False:
-    main()
-date_after_end = datetime.datetime.today()
-score = int((date_after_end.minute - date_before_start.minute) * CONST_SECOND_IN_MINUTE + (
-        date_after_end.second - date_before_start.second))
-print(score)
+while exit_flag is False:
+    game()
+if win_flag:
+    date_after_end = datetime.datetime.today()
+    score = int((date_after_end.minute - date_before_start.minute) * CONST_SECOND_IN_MINUTE + (
+            date_after_end.second - date_before_start.second))
+    print(score)
 
-con = sqlite3.connect("score.db")
-cur = con.cursor()
-score_from_db = cur.execute(
-    f"""SELECT score{ex.return_level()} FROM account_scores WHERE name = '{ex.return_name()}'""").fetchall()
-if score <= score_from_db[0][0]:
-    cur.execute(f"""UPDATE account_scores
-                SET score{ex.return_level()} = {score}
-                WHERE name = '{ex.return_name()}'""").fetchall()
+    con = sqlite3.connect("score.db")
+    cur = con.cursor()
+    score_from_db = cur.execute(
+        f"""SELECT score{ex.return_level()} FROM account_scores WHERE name = '{ex.return_name()}'""").fetchall()
+    if score <= score_from_db[0][0]:
+        cur.execute(f"""UPDATE account_scores
+                    SET score{ex.return_level()} = {score}
+                    WHERE name = '{ex.return_name()}'""").fetchall()
 
-score_from_db = cur.execute(
-    f"""SELECT score{ex.return_level()} FROM account_scores WHERE name = '{ex.return_name()}'""").fetchall()
+    score_from_db = cur.execute(
+        f"""SELECT score{ex.return_level()} FROM account_scores WHERE name = '{ex.return_name()}'""").fetchall()
 
-run = True
-while run:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-        key = pygame.key.get_pressed()
-        if key[pygame.K_TAB]:
-            run = False
-    font = pygame.font.SysFont(None, 70)
-    img = font.render(f'CONGRATULATIONS! YOUR SCORE: {score}. BEST SCORE: {score_from_db[0][0]}', True, (255, 0, 0))
-    img2 = font.render(f'Press TAB to quit.', True, (255, 0, 0))
-    screen.fill((0, 255, 0))
-    screen.blit(img, (475, 325))
-    screen.blit(img2, (900, 425))
-    pygame.display.flip()
-con.commit()
+    run = True
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            key = pygame.key.get_pressed()
+            if key[pygame.K_TAB]:
+                run = False
+        font = pygame.font.SysFont(None, 70)
+        img = font.render(f'CONGRATULATIONS! YOUR SCORE: {score}. BEST SCORE: {score_from_db[0][0]}', True, (255, 0, 0))
+        img2 = font.render(f'Press TAB to quit.', True, (255, 0, 0))
+        screen.fill((0, 255, 0))
+        screen.blit(img, (475, 325))
+        screen.blit(img2, (900, 425))
+        pygame.display.flip()
+    con.commit()
